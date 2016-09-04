@@ -106,6 +106,24 @@ class WP_Slack_Event_Manager {
 						return false;
 					}
 
+
+					if ( 'pitch' !== $old_status && 'pitch' === $new_status ) {
+						$excerpt = has_excerpt( $post->ID ) ?
+							apply_filters( 'get_the_excerpt', $post->post_excerpt )
+							:
+							wp_trim_words( strip_shortcodes( $post->post_content ), 55, '&hellip;' );
+
+						return sprintf(
+							'New post pitch: *<%1$s|%2$s>* by *%3$s*' . "\n" .
+							'> %4$s',
+
+							admin_url( sprintf( 'post.php?post=%d&action=edit', $post->ID ) ),
+							html_entity_decode( get_the_title( $post->ID ), ENT_QUOTES, get_bloginfo( 'charset' ) ),
+							get_the_author_meta( 'display_name', $post->post_author ),
+							html_entity_decode( $excerpt, ENT_QUOTES, get_bloginfo( 'charset' ) )
+						);
+					}
+					
 					if ( 'pending' !== $old_status && 'pending' === $new_status ) {
 						$excerpt = has_excerpt( $post->ID ) ?
 							apply_filters( 'get_the_excerpt', $post->post_excerpt )
